@@ -13,9 +13,16 @@ import { addCampaingn } from '../store/slices/dashboardSlice';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { Alert, Button, Snackbar } from '@mui/material';
+import {
+	Alert,
+	Button,
+	InputAdornment,
+	OutlinedInput,
+	Snackbar,
+} from '@mui/material';
 import { FaPlus } from 'react-icons/fa6';
 import AddCampaign from './Modals/AddCampaign';
+import { FiSearch } from 'react-icons/fi';
 
 const columns = [
 	{ field: 'name', headerName: 'Name', flex: 1 },
@@ -67,6 +74,7 @@ export default function Dashboard() {
 	const [filteredRow, setFilteredRow] = useState([]);
 	const [startDate, setStartDate] = useState(null);
 	const [endDate, setEndDate] = useState(null);
+	const [searchQuery, setSearchQuery] = useState('');
 	const campaignData = useSelector(
 		(state) => state.dashboardSlice.campaignData
 	);
@@ -75,18 +83,23 @@ export default function Dashboard() {
 	const [openModal, setOpenModal] = useState(false);
 	const [showToast, setShowToast] = useState(false);
 	useEffect(() => {
+		let filtered = [...campaignData];
+
 		if (startDate && endDate) {
-			const filtered = campaignData.filter((row) => {
+			filtered = filtered.filter((row) => {
 				const rowStartDate = new Date(row.startDate);
 				const rowEndDate = new Date(row.endDate);
-				console.log(rowStartDate >= startDate && rowEndDate <= endDate);
 				return rowStartDate >= startDate && rowEndDate <= endDate;
 			});
-			setFilteredRow(filtered);
-		} else {
-			setFilteredRow(campaignData);
 		}
-	}, [startDate, endDate, campaignData]);
+		if (searchQuery.trim()) {
+			filtered = filtered.filter((row) =>
+				row.name.toLowerCase().includes(searchQuery.toLowerCase())
+			);
+		}
+
+		setFilteredRow(filtered);
+	}, [startDate, endDate, campaignData, searchQuery]);
 
 	useEffect(() => {
 		setFilteredRow(campaignData);
@@ -158,6 +171,26 @@ export default function Dashboard() {
 								)}
 							</div>
 							<div className='flex items-center gap-4 justify-self-end'>
+								<OutlinedInput
+									id='outlined-adornment-weight'
+									value={searchQuery}
+									onChange={(e) => setSearchQuery(e.target.value)}
+									startAdornment={
+										<InputAdornment position='start'>
+											<FiSearch size={20} />
+										</InputAdornment>
+									}
+									placeholder='Search Campaign Name'
+									sx={{
+										borderRadius: '8px',
+										width: '300px',
+									}}
+									size='small'
+									aria-describedby='outlined-weight-helper-text'
+									inputProps={{
+										'aria-label': 'weight',
+									}}
+								/>
 								<Button
 									onClick={() => setOpenModal(true)}
 									variant='contained'
@@ -167,9 +200,10 @@ export default function Dashboard() {
 										backgroundColor: 'oklch(0.897 0.196 126.665)',
 										textTransform: 'none',
 										color: 'black',
-										height: '45px',
+										height: '40px',
 										borderRadius: '8px',
 										fontWeight: '600',
+										flexShrink: 0,
 										fontFamily: 'Open Sans, sans-serif',
 										'&:hover': {
 											backgroundColor: 'oklch(0.897 0.196 126.665)',
