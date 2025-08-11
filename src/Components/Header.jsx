@@ -1,5 +1,5 @@
 /** @format */
-
+import React from 'react';
 import {
 	InputAdornment,
 	OutlinedInput,

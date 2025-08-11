@@ -1,5 +1,5 @@
 /** @format */
-
+import React from 'react';
 import icon from '../assets/icon.png';
 import logo from '../assets/logo.svg';
 import { FaAngleLeft } from 'react-icons/fa6';
