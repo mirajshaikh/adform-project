@@ -1,11 +1,13 @@
 /** @format */
 import './App.css';
+import Dashboard from './Components/Dashboard';
+import RootLayout from './Components/RootLayout';
 
 function App() {
 	return (
-		<>
-			<h1 class='text-3xl font-bold underline'>Hello world!</h1>
-		</>
+		<RootLayout>
+			<Dashboard />
+		</RootLayout>
 	);
 }
 
