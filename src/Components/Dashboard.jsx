@@ -107,6 +107,9 @@ export default function Dashboard() {
 
 	useEffect(() => {
 		dispatch(getUserData());
+	}, [dispatch]);
+
+	useEffect(() => {
 		const addCampaignsGlobally = (newCampaigns) => {
 			if (!Array.isArray(newCampaigns) || newCampaigns.length === 0) {
 				console.error('Invalid campaign data provided');
@@ -129,6 +132,20 @@ export default function Dashboard() {
 				return 'Invalid campaign data';
 			}
 
+			// Check for duplicate IDs
+			const existingIds = campaignData.map((campaign) => campaign.id);
+			console.log(existingIds);
+			const duplicateIds = newCampaigns
+				.filter((campaign) => existingIds.includes(campaign.id))
+				.map((campaign) => campaign.id);
+
+			if (duplicateIds.length > 0) {
+				console.error(
+					`Campaign(s) with ID(s) ${duplicateIds.join(', ')} already exist`
+				);
+				return 'Duplicate campaign IDs found';
+			}
+
 			dispatch(addCampaingn(newCampaigns));
 			return 'Campaigns added successfully';
 		};
@@ -136,7 +153,7 @@ export default function Dashboard() {
 		return () => {
 			window.addCampaignsGlobally = null;
 		};
-	}, [dispatch]);
+	}, [dispatch, campaignData]);
 
 	return (
 		<div className='relative w-full h-[calc(100svh-200px)]'>
@@ -145,7 +162,7 @@ export default function Dashboard() {
 			) : (
 				<>
 					<LocalizationProvider dateAdapter={AdapterDateFns}>
-						<div className='grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 items-center justify-between'>
+						<div className='grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 mb-4 items-center justify-between'>
 							<div className='flex items-center gap-4'>
 								<DesktopDatePicker
 									label='Start Date'

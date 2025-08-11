@@ -7,17 +7,21 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addCampaingn } from '../../store/slices/dashboardSlice';
 
 function AddCampaign({ open, handleClose, setShowToast }) {
 	const [startDate, setStartDate] = useState(null);
 	const [, setEndDate] = useState(null);
 	const dispatch = useDispatch();
+	const campaignData = useSelector(
+		(state) => state.dashboardSlice.campaignData
+	);
 	const {
 		control,
 		handleSubmit,
 		reset,
+		setError,
 		formState: { errors },
 	} = useForm({
 		defaultValues: {
@@ -32,6 +36,18 @@ function AddCampaign({ open, handleClose, setShowToast }) {
 	});
 
 	const onSubmit = (data) => {
+		const isDuplicate = campaignData.some(
+			(campaign) => campaign.id === Number(data.id)
+		);
+
+		if (isDuplicate) {
+			setError('id', {
+				type: 'manual',
+				message: 'Campaign ID already exists',
+			});
+			return;
+		}
+
 		const formattedData = {
 			...data,
 			startDate: data.startDate
@@ -40,6 +56,9 @@ function AddCampaign({ open, handleClose, setShowToast }) {
 			endDate: data.endDate
 				? new Date(data.endDate).toLocaleDateString()
 				: null,
+			id: Number(data.id),
+			userId: Number(data.userId),
+			budget: Number(data.budget),
 		};
 
 		dispatch(addCampaingn([formattedData]));
